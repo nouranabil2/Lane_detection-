@@ -73,18 +73,14 @@ def combined_thresholds(image, ksize = 3):
     #combined[ (mag_binary == 1) ] = 1
 
     return combined
-def warp(img):
-    src = np.float32([(550, 460),     # top-left
-                               (150, 720),     # bottom-left
-                               (1200, 720),    # bottom-right
-                               (770, 460)])    # top-right
-    dst = np.float32([(100, 0),
-                               (100, 720),
-                               (1100, 720),
-                               (1100, 0)])
-    M = cv2.getPerspectiveTransform(src, dst)
-    M_inv = cv2.getPerspectiveTransform(dst,src)
+def warp(image,state='in'):
 
-    def forward(img, img_size=(1280, 720), flags=cv2.INTER_LINEAR):
+    src = np.float32([[570,460],[image.shape[1] - 573,460],[image.shape[1] - 150,image.shape[0]],[150,image.shape[0]]])
+    dst = np.float32([[200,0],[image.shape[1]-200,0],[image.shape[1]-200,image.shape[0]],[200,image.shape[0]]])
+    if state == 'in':
+        M = cv2.getPerspectiveTransform(src, dst)
+    if state == 'out':
+        M = cv2.getPerspectiveTransform(dst, src)
     
-        return cv2.warpPerspective(img, M, img_size, flags=flags)
+    warped = cv2.warpPerspective(image, M, (image.shape[1],image.shape[0]), flags=cv2.INTER_LINEAR)
+    return warped
