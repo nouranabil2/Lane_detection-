@@ -73,3 +73,37 @@ def combined_thresholds(image, ksize = 3):
     #combined[ (mag_binary == 1) ] = 1
 
     return combined
+
+
+
+
+def filter(image):
+    
+    hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+    s_channel = hls[:,:,2]
+    l_channel = hls[:,:,1]
+
+    sxbinary = combined_thresholds(image)
+
+
+    # Threshold color channel
+    s_thresh_min = 80
+    s_thresh_max = 255
+    l_thresh_min = 190
+    l_thresh_max = 255  
+    
+    
+    s_binary = np.zeros_like(s_channel)
+    s_binary[((s_channel >= s_thresh_min) & (s_channel <= s_thresh_max)) ] = 1
+    
+    l_binary = np.zeros_like(s_channel)
+    l_binary[((l_channel >= l_thresh_min) & (l_channel <= l_thresh_max))] = 1
+
+    # Combine the two binary thresholds
+    combined_binary = np.zeros_like(sxbinary)
+    #combined_binary [(l_binary == 1)& (sxbinary == 1)] = 1
+    combined_binary[((s_binary == 1) & (sxbinary == 1)) | ((sxbinary == 1) & (l_binary == 1))] = 1
+    
+    return combined_binary
+
+
