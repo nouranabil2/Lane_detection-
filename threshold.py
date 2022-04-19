@@ -68,7 +68,8 @@ def combined_thresholds(image, ksize = 3):
     mag_binary = mag_thresh(image, sobel_kernel=ksize, mag_thresh=(3, 255))
     dir_binary = dir_threshold(image, sobel_kernel=ksize, thresh=(0*np.pi/180, 90*np.pi/180)) 
     combined = np.zeros_like(dir_binary, np.uint8)    
-    combined[((gradx == 1) ) ] = 1
+    #combined[((gradx == 1) ) ] = 1
+    combined[((gradx == 1) ) & ((mag_binary == 1) & (dir_binary == 1))] = 1
     #combined[ (mag_binary == 1) ] = 1
 
     return combined
