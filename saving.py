@@ -358,6 +358,18 @@ def poly(image):
    binary_warped = warp(filtered_binary)
    final_image,polyimg = draw_lane(image, binary_warped, filtered_binary)
    return polyimg
+def covert_filter(image):
+  filtered_binary = filter(image)
+  filtered_binary_grayscale=filtered_binary*255
+  gtb=cv2.cvtColor(filtered_binary_grayscale,cv2.COLOR_GRAY2RGB)
+  return gtb    
+
+def covert_warp(image):
+  filtered_binary = filter(image)
+  binary_warped = warp(filtered_binary)
+  warp_grayscale=binary_warped*255
+  gtb1=cv2.cvtColor(warp_grayscale,cv2.COLOR_GRAY2RGB)
+  return gtb1
 
 video= cv2.VideoCapture('project_video.mp4')
 
@@ -370,10 +382,7 @@ writer= cv2.VideoWriter('p4.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,he
 while True:
     ret,frame= video.read()
     gray=process_image(frame)
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    #gtb=cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
     
-    #gray=poly(frame)
     writer.write(gray)
     cv2.imshow('frame', gray)
 
