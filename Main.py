@@ -77,7 +77,7 @@ def main():
 
     strin= args[1]
     strout=args[2]
-    mode = int(args[3])
+    mode = int(args[4])
     saving(strin,strout,mode)
 
 if __name__ == "__main__":
