@@ -1,3 +1,7 @@
+import numpy as np
+import cv2
+from threshold import *
+
 class LaneDetector:
 
     def __init__(self):
@@ -168,7 +172,7 @@ class LaneDetector:
         cv2.fillPoly(window_img, np.int_([right_line_pts]), (0, 0, 255))
         cv2.fillPoly(window_img, np.int_([center_line_pts]), (0, 255, 0))
 
-        window_img_unwrapped = inwarp(window_img)
+        window_img_unwrapped = warp(window_img, state='out')
 
         result = cv2.addWeighted(orignal_image, 1, window_img_unwrapped, 0.3, 0)
 
