@@ -1,3 +1,4 @@
+from unittest import result
 import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -337,7 +338,6 @@ class LaneDetector:
         
         return result,window_img
 
-mode=0
 lane_detector = LaneDetector()
 draw_lane = lane_detector.draw_lane
 def process_image(image):
@@ -358,10 +358,11 @@ def poly(image):
    final_image,polyimg = draw_lane(image, binary_warped, filtered_binary)
    return polyimg
 def combine():
-    first_half1=VideoFileClip('p3.mp4')
-    first_half2=VideoFileClip('p4.mp4')
-    second_half1=VideoFileClip('p2.mp4')
-    second_half3=VideoFileClip('p1.mp4')
+
+    first_half1=VideoFileClip('out1.mp4')
+    first_half2=VideoFileClip('out2.mp4')
+    second_half1=VideoFileClip('out4.mp4')
+    second_half3=VideoFileClip('out3.mp4')
     first_half=clips_array([[first_half1,first_half2]])
     second_half=clips_array([[second_half1,second_half3]])
     video=clips_array([[first_half.set_position(600,400)],[second_half.set_position(600,400)]])
@@ -369,59 +370,37 @@ def combine():
     video.write_videofile('Total.mp4')
     return print('Done')
 
-video= cv2.VideoCapture('project_video.mp4')
+def covert_filter(image):
+  filtered_binary = filter(image)
+  filtered_binary_grayscale=filtered_binary*255
+  gtb=cv2.cvtColor(filtered_binary_grayscale,cv2.COLOR_GRAY2RGB)
+  return gtb    
 
-width= int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-
-height= int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-writer1= cv2.VideoWriter('a1.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
-writer2= cv2.VideoWriter('a2.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
-writer3= cv2.VideoWriter('a3.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
-writer4= cv2.VideoWriter('a4.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
-if mode==0:
-    writer= cv2.VideoWriter('a.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
-
-   
-
-
-
-while True:
-    ret,frame= video.read()
-    #gray=process_image(frame)
-    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    #gtb=cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
+def covert_warp(image):
+  filtered_binary = filter(image)
+  binary_warped = warp(filtered_binary)
+  warp_grayscale=binary_warped*255
+  gtb1=cv2.cvtColor(warp_grayscale,cv2.COLOR_GRAY2RGB)
+  return gtb1
+def saving(strin,strout,mode):
+    
+    clip1 = VideoFileClip(strin)
+    output = strout
     if mode==0:
-        gray=process_image(frame)
-        writer.write(gray)
-        
-
+        finalresult = clip1.fl_image(process_image) 
+        finalresult.write_videofile(output, audio=False)
     if mode==1:
-     
-     filtered_binary = filter(frame)
-        #applying wrapfunction to get the prespective
-     binary_warped = warp(filtered_binary,state='in')
-     #convert to grey scale to be able to draw
-     filtered_binary_grayscale=filtered_binary*255
-     binary_warped_grayscale=binary_warped*255
-     gtb=cv2.cvtColor(filtered_binary_grayscale,cv2.COLOR_GRAY2RGB)
-     gtb1=cv2.cvtColor(binary_warped_grayscale,cv2.COLOR_GRAY2RGB)
-     final_image,polyimg = draw_lane(frame, binary_warped, filtered_binary)
-     writer1.write(gtb)
-     
-     writer2.write(gtb1)
-    
-     writer3.write(polyimg)
-
-     writer4.write(final_image)
-    
-
-    #gray=poly(frame)
-   
-
-    if cv2.waitKey(1) & 0xFF == 27:
-        break
+        finalresult = clip1.fl_image(process_image) 
+        finalresult.write_videofile('out1.mp4', audio=False)
+        filteringresult = clip1.fl_image(covert_filter) 
+        filteringresult.write_videofile('out2.mp4', audio=False)
+        prespectiveresult = clip1.fl_image(covert_warp) 
+        prespectiveresult.write_videofile('out3.mp4', audio=False)
+        polyshape = clip1.fl_image(poly) 
+        polyshape.write_videofile('out4.mp4', audio=False)
+        combined_result=combine()
 
 
-video.release()
-writer.release()
-cv2.destroyAllWindows()
+strin="challenge_video.mp4"
+strout='tttt_out.mp4'
+saving(strin,strout,0)
