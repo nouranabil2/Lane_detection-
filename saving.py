@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import cv2
 from IPython.core.display import Video
 import glob
+from moviepy.editor import *
 
 def abs_sobel_thresh(img, orient='x', sobel_kernel=3, thresh=(0, 255)):
 
@@ -106,7 +107,7 @@ def filter(image):
     combined_binary[((s_binary == 1) & (sxbinary == 1)) | ((sxbinary == 1) & (l_binary == 1))] = 1
     
     return combined_binary
-    
+
 
 def warp(image,state='in'):
 
@@ -119,8 +120,6 @@ def warp(image,state='in'):
     
     warped = cv2.warpPerspective(image, M, (image.shape[1],image.shape[0]), flags=cv2.INTER_LINEAR)
     return warped
-
-
 
 class LaneDetector:
     
@@ -338,7 +337,7 @@ class LaneDetector:
         
         return result,window_img
 
-
+mode=0
 lane_detector = LaneDetector()
 draw_lane = lane_detector.draw_lane
 def process_image(image):
@@ -350,7 +349,7 @@ def process_image(image):
     filtered_binary_grayscale=filtered_binary*255
     binary_warped_grayscale=binary_warped*255
     #applying draw fn to get the lane
-    final_image = draw_lane(image, binary_warped, filtered_binary)
+    final_image,polyimg = draw_lane(image, binary_warped, filtered_binary)
     return final_image
 
 def poly(image):
@@ -358,33 +357,66 @@ def poly(image):
    binary_warped = warp(filtered_binary)
    final_image,polyimg = draw_lane(image, binary_warped, filtered_binary)
    return polyimg
-def covert_filter(image):
-  filtered_binary = filter(image)
-  filtered_binary_grayscale=filtered_binary*255
-  gtb=cv2.cvtColor(filtered_binary_grayscale,cv2.COLOR_GRAY2RGB)
-  return gtb    
-
-def covert_warp(image):
-  filtered_binary = filter(image)
-  binary_warped = warp(filtered_binary)
-  warp_grayscale=binary_warped*255
-  gtb1=cv2.cvtColor(warp_grayscale,cv2.COLOR_GRAY2RGB)
-  return gtb1
+def combine():
+    first_half1=VideoFileClip('p3.mp4')
+    first_half2=VideoFileClip('p4.mp4')
+    second_half1=VideoFileClip('p2.mp4')
+    second_half3=VideoFileClip('p1.mp4')
+    first_half=clips_array([[first_half1,first_half2]])
+    second_half=clips_array([[second_half1,second_half3]])
+    video=clips_array([[first_half.set_position(600,400)],[second_half.set_position(600,400)]])
+    video.ipython_display(width=1200,height=700)
+    video.write_videofile('Total.mp4')
+    return print('Done')
 
 video= cv2.VideoCapture('project_video.mp4')
 
 width= int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-height= int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-writer= cv2.VideoWriter('p4.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+height= int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+writer1= cv2.VideoWriter('a1.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+writer2= cv2.VideoWriter('a2.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+writer3= cv2.VideoWriter('a3.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+writer4= cv2.VideoWriter('a4.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+if mode==0:
+    writer= cv2.VideoWriter('a.mp4', cv2.VideoWriter_fourcc(*'DIVX'), 25, (width,height))
+
+   
+
 
 
 while True:
     ret,frame= video.read()
-    gray=process_image(frame)
+    #gray=process_image(frame)
+    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    #gtb=cv2.cvtColor(gray,cv2.COLOR_GRAY2RGB)
+    if mode==0:
+        gray=process_image(frame)
+        writer.write(gray)
+        
+
+    if mode==1:
+     
+     filtered_binary = filter(frame)
+        #applying wrapfunction to get the prespective
+     binary_warped = warp(filtered_binary,state='in')
+     #convert to grey scale to be able to draw
+     filtered_binary_grayscale=filtered_binary*255
+     binary_warped_grayscale=binary_warped*255
+     gtb=cv2.cvtColor(filtered_binary_grayscale,cv2.COLOR_GRAY2RGB)
+     gtb1=cv2.cvtColor(binary_warped_grayscale,cv2.COLOR_GRAY2RGB)
+     final_image,polyimg = draw_lane(frame, binary_warped, filtered_binary)
+     writer1.write(gtb)
+     
+     writer2.write(gtb1)
     
-    writer.write(gray)
-    cv2.imshow('frame', gray)
+     writer3.write(polyimg)
+
+     writer4.write(final_image)
+    
+
+    #gray=poly(frame)
+   
 
     if cv2.waitKey(1) & 0xFF == 27:
         break
