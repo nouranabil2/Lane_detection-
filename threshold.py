@@ -101,9 +101,9 @@ def filter(image):
 
 
     # Threshold color channel
-    s_thresh_min = 80
+    s_thresh_min = 40
     s_thresh_max = 255
-    l_thresh_min = 190
+    l_thresh_min = 150
     l_thresh_max = 255  
     
     
