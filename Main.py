@@ -1,4 +1,4 @@
-from unittest import result
+#from unittest import result
 import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -72,6 +72,13 @@ def saving(strin,strout,mode):
         combined_result=combine()
 
 
-strin="challenge_video.mp4"
-strout='stt_out.mp4'
-saving(strin,strout,1)
+def main():
+    args = sys.argv
+
+    strin= args[1]
+    strout=args[2]
+    mode = int(args[3])
+    saving(strin,strout,mode)
+
+if __name__ == "__main__":
+    main()
