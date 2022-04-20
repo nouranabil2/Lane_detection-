@@ -32,7 +32,7 @@ def poly(image):
    return polyimg
 
 #combining all processes of the video in one video
-def combine():
+def combine(strout):
 
     first_half1=VideoFileClip('out1.mp4')
     first_half2=VideoFileClip('out2.mp4')
@@ -83,7 +83,7 @@ def saving(strin,strout,mode):
         polyshape = clip1.fl_image(poly) 
         polyshape.write_videofile('out4.mp4', audio=False)
         #combining the 4 previous videos together
-        combined_result=combine()
+        combined_result=combine(strout)
 
 
 def main():
